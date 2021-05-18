@@ -1,0 +1,246 @@
+/*
+ *  Created on: Jan 17, 2021
+ *      Author: Aaron Crampton
+ */
+#include <iostream>
+#include <iomanip>
+#include <ios>
+#include <stdexcept>
+#include <string>
+#include <iostream>
+#include <stdio.h>
+#include <time.h>
+#include <cstdlib>
+
+using namespace std;
+
+int sysHrTwelve;
+int sysMin;
+int sysSec;
+int sysHrTwentyFour;
+int totHour;
+int totHrTwelve;
+int totHrTwentyFour;
+int totMinute;
+int totSecond;
+char amOrPm;
+
+
+// Time code courtesy of: https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c, Author TrungTN
+// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+const string CurrentTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+    return buf;
+}
+
+int SysHourTwelve () {
+	sysHrTwelve = stoi((CurrentTime().substr(11,2)), nullptr);
+	if (sysHrTwelve > 12) {
+		sysHrTwelve = sysHrTwelve - 12;
+	}
+	return sysHrTwelve;
+}
+
+int SysHourTwentyFour () {
+	sysHrTwentyFour = 	sysHrTwelve = stoi((CurrentTime().substr(11,2)), nullptr);
+	return sysHrTwentyFour;
+}
+
+int SysMinute () {
+	sysMin = stoi((CurrentTime().substr(14,2)), nullptr);
+	return sysMin;
+}
+
+int SysSecond () {
+	sysSec = stoi((CurrentTime().substr(17,2)), nullptr);
+	return sysSec;
+}
+
+int TotHourTwelve() {
+	totHrTwelve = sysHrTwelve + 1;
+	if (totHrTwelve > 12) {
+		totHrTwelve = totHrTwelve - 12;
+	}
+	return totHrTwelve;
+}
+
+int TotHourTwentyFour () {
+	totHrTwentyFour = sysHrTwentyFour + 1;
+	if (totHrTwentyFour > 24) {
+		totHrTwentyFour = totHrTwentyFour - 24;
+	}
+	return totHrTwentyFour;
+}
+
+int TotMinute() {
+	totMinute = sysHrTwelve + 1;
+	if (totMinute >= 60) {
+		totMinute = totMinute - 60;
+		TotHourTwelve();
+		TotHourTwentyFour();
+	}
+	return totMinute;
+}
+
+int TotSecond() {
+	totSecond = sysSec + 1;
+	if (totSecond >= 60) {
+		totSecond = totSecond - 60;
+		TotMinute();
+	}
+	return totSecond;
+}
+
+char TimeConvertAmPm (char PmAm, int hourTwentyFour) {
+	if ((hourTwentyFour) >= 12) {
+	   PmAm = 'P';
+	}
+	else {
+	   PmAm = 'A';
+	}
+	return PmAm;
+	cout << "";
+}
+
+void PrintClock(int hourTwelve, int minute, int second, char pOa, int hourTwentyFour) {
+
+
+	cout << "**************************       **************************" << endl;
+	cout << "*      12-Hour Clock     *       *      24-Hour Clock     *" << endl;
+	cout  << "*      ";
+	cout.fill('0');
+	cout << setw(2);
+	cout << hourTwelve;
+	cout << ":";
+	cout << setw(2);
+	cout << minute;
+	cout << ":";
+	cout << setw(2);
+	cout << second;
+	cout << " " << pOa << "M" << "       *       *        ";
+	cout << setw(2);
+	cout << hourTwentyFour;
+	cout << ":";
+	cout << setw(2);
+	cout << minute;
+	cout << ":";
+	cout << setw(2);
+	cout << second;
+	cout << "        *" << endl;
+	cout << "**************************       **************************";
+}
+
+void PrintMenu() {
+	cout << "**************************" << endl;
+	cout << "* 1-Add One Hour         *" << endl;
+	cout << "* 2-Add One Minute       *" << endl;
+	cout << "* 3-Add One Second       *" << endl;
+	cout << "* 4-Exit Program         *" << endl;
+	cout << "**************************" << endl;
+}
+
+//Function for clearing the screen.  The Eclipse console does not clear.  Tutor said is was Eclipse and in C prompt it will work.
+//Thus, the definition of done. ;)
+void WipeScrn() {
+	//cout << string(100, "\n");  //Code example found from: http://www.cplusplus.com/articles/4z18T05o/
+    system("CLS");               //Code from the tutor that "the internet" said was not as good.
+}
+
+
+
+int main () {
+
+	int menuSelection = NULL;
+	char pmOrAm;
+
+	//loads initial screen before making the first selection
+    WipeScrn();
+	pmOrAm = TimeConvertAmPm(pmOrAm, SysHourTwentyFour());
+    PrintClock (SysHourTwelve(), SysMinute(), SysSecond(), pmOrAm, SysHourTwentyFour());
+    cout << endl;
+    cout << endl;
+	PrintMenu();
+
+	//Entry for Menu Selection
+	menuSelection = NULL;
+	cout << "Enter Selection: ";
+	cin >> menuSelection;
+
+	//FIXME method to handle non-digit entry into menu.
+	while (isdigit(menuSelection == false)) {
+		cout << "Invalid, Enter Selection: ";
+		cin >> menuSelection;
+		menuSelection = 0;
+		break;
+	}
+
+	while (menuSelection != 4) {
+		try {
+
+			// Selection 1 hours, both 12 and 24
+			if (menuSelection == 1) {
+				TotHourTwelve();
+				TotHourTwentyFour();
+				pmOrAm = TimeConvertAmPm(pmOrAm, totHrTwentyFour);
+			}
+
+			//Selection 2: Add Minutes
+			else if (menuSelection == 2) {
+				TotMinute();
+					if (convHrTwelve == 12) {
+						hrTwelve = 0;
+						if ((pmOrAm == 'A') && (initialCounter > 1)) {
+							pmOrAm = 'P';
+						}
+						if ((pmOrAm == 'P') && (initialCounter > 1)) {
+							pmOrAm = 'A';
+						}
+				}
+			}
+
+			//Selection 3: Add Seconds
+			else if (menuSelection == 3) {
+				TotSecond();
+				if (TotSecond() >= 60) {
+					totSecond = 0;
+					TotMinute();
+					if ((pmOrAm == 'A') && (initialCounter > 1)) {
+						pmOrAm = 'P';
+					}
+					if ((pmOrAm == 'P') && (initialCounter > 1)) {
+						pmOrAm = 'A';
+					}
+				}
+			}
+			else if (menuSelection == 'npos') {
+				continue;
+			}
+			else {
+				cout << "Invalid Selection " << menuSelection<< endl;
+				//throw runtime_error ("");
+			}
+		    if (initialCounter > 99999999) {
+			   initialCounter = 2;
+		    }
+
+			WipeScrn();
+		    PrintClock (convHrTwelve, convMinutes, sec, pmOrAm, convHrTwentyFour);
+		    cout << endl;
+		    cout << endl;
+			PrintMenu();
+			menuSelection = NULL;
+			cout << "Enter Selection: ";
+			cin >> menuSelection;
+			}
+		catch(runtime_error& excpt) {
+			cout << excpt.what() << endl;
+			cout << "Selection Error\n" << menuSelection;
+		}
+	}
+	cout << "Exiting." << endl;
+
+}
